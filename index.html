@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ティアちゃん</title>
+    <style>
+      * {
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+      }
+      header {
+        height: 100px;
+        /* background-color: rgba(233, 233, 233, 0.8); */
+        background: #bfbfbf;
+        background: linear-gradient(
+          180deg,
+          rgba(191, 191, 191, 1) 0%,
+          rgba(255, 255, 255, 0.12) 100%
+        );
+        position: relative;
+      }
+      body {
+        background: url(/images/desktop.webp) no-repeat 0 0 / cover fixed;
+      }
+
+      #pageTitle {
+        text-decoration: none;
+        color: rgba(250, 46, 46, 0.545);
+      }
+
+      #pageTitle img {
+        width: 341px;
+        position: absolute;
+        top: 17px;
+        left: 112px;
+      }
+      #pageTitle img {
+        transition: filter 0.3s ease;
+      }
+
+      #pageTitle img:hover {
+        filter: sepia(30%) saturate(70%) brightness(1.1);
+      }
+
+      nav {
+        display: flex;
+        justify-content: flex-end;
+        gap: 4px;
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+      }
+      nav a {
+        flex: 1;
+        max-width: 143px;
+        padding: 18px 0;
+        text-align: center;
+        text-decoration: none;
+        font-size: 16px;
+        color: #330f0faa;
+      }
+      nav a:nth-child(1) {
+        background-color: rgba(180, 178, 255, 0.5);
+      }
+      nav a:hover:nth-child(1) {
+        background-color: rgba(158, 154, 218, 0.5);
+      }
+      nav a:nth-child(2) {
+        background-color: rgba(255, 178, 216, 0.5);
+      }
+      nav a:hover:nth-child(2) {
+        background-color: rgba(220, 154, 187, 0.5);
+      }
+      nav a:nth-child(3) {
+        background-color: rgba(228, 255, 178, 0.5);
+      }
+      nav a:hover:nth-child(3) {
+        background-color: rgba(204, 228, 160, 0.5);
+      }
+
+      section.box {
+        width: 1000px;
+        height: 1000px;
+        background-color: rgba(253, 175, 192, 0.5);
+        margin: 20px auto;
+        padding: 10px;
+      }
+      @media screen and (max-width: 500px) {
+        body {
+          background: url(/images/phone.webp) no-repeat 0 0 / cover fixed;
+        }
+        #pageTitle img {
+          width: 341px;
+          position: absolute;
+          top: 17px;
+          left: 15px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>
+        <a href="/" id="pageTitle"><img src="/images/logo.png" alt="" /></a>
+      </h1>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/blog">Blog</a>
+        <a href="about">About</a>
+      </nav>
+    </header>
+    <section class="box"></section>
+  </body>
+</html>
