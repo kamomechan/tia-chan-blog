@@ -11,7 +11,10 @@
         box-sizing: border-box;
       }
       header {
+        position: fixed;
+        top: 0;
         height: 100px;
+        width: 100%;
         /* background-color: rgba(233, 233, 233, 0.8); */
         background: #bfbfbf;
         background: linear-gradient(
@@ -19,7 +22,6 @@
           rgba(191, 191, 191, 1) 0%,
           rgba(255, 255, 255, 0.12) 100%
         );
-        position: relative;
       }
       body {
         background: url(/images/desktop.webp) no-repeat 0 0 / cover fixed;
@@ -118,13 +120,13 @@
         transform: rotate(-45deg);
       }
 
-      /* section.box {
-        width: 1000px;
-        height: 1000px;
+      section.box {
         background-color: rgba(253, 175, 192, 0.5);
-        margin: 20px auto;
-        padding: 10px;
-      } */
+        width: 80%;
+        height: 1000px;
+        margin: 10% auto;
+      }
+
       @media (min-width: 501px) {
         .hamburger {
           display: none;
@@ -137,10 +139,8 @@
         }
 
         #pageTitle img {
-          width: 341px;
-          position: absolute;
-          top: 17px;
-          left: 15px;
+          left: 50%;
+          transform: translateX(-50%);
         }
 
         nav {
@@ -172,6 +172,10 @@
 
         body {
           transition: transform 0.3s ease;
+        }
+
+        section.box {
+          margin: 25% auto;
         }
       }
     </style>
