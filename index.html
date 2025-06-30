@@ -170,6 +170,25 @@
         background-color: rgba(234, 234, 234, 0.45);
       }
 
+      .back-to-top {
+        position: fixed;
+        bottom: -100px;
+        right: 20px;
+        width: 150px;
+        cursor: pointer;
+        transition: bottom 0.3s ease, opacity 0.3s ease;
+        z-index: 999;
+        opacity: 0.8;
+      }
+      .back-to-top:hover {
+        opacity: 1;
+        bottom: 20px;
+      }
+
+      .back-to-top.show {
+        bottom: 20px;
+      }
+
       @media (min-width: 501px) {
         .hamburger {
           display: none;
@@ -232,6 +251,10 @@
         article h1 {
           font-size: 28px;
         }
+        .back-to-top {
+          width: 100px;
+          bottom: -60px;
+        }
       }
     </style>
   </head>
@@ -285,6 +308,11 @@
         >
       </div>
     </section>
+
+    <footer>
+      <img class="back-to-top" src="images/page-top.png" alt="Back to Top" />
+    </footer>
+
     <script>
       const header = document.querySelector("header");
       let lastScroll = 0;
@@ -310,6 +338,16 @@
         }
 
         lastScroll = currentScroll;
+      });
+
+      const backToTopBtn = document.querySelector(".back-to-top");
+
+      window.addEventListener("scroll", () => {
+        backToTopBtn.classList.toggle("show", window.scrollY > 300);
+      });
+
+      backToTopBtn.addEventListener("click", () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
       });
     </script>
   </body>
