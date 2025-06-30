@@ -22,7 +22,15 @@
           rgba(191, 191, 191, 1) 0%,
           rgba(255, 255, 255, 0.12) 100%
         );
+        transition: all 0.3s ease-in-out;
+        transform: translateY(0);
+        opacity: 1;
       }
+
+      .hidden {
+        transform: translateY(-100%);
+      }
+
       body {
         background: url(/images/desktop.webp) no-repeat 0 0 / cover fixed;
       }
@@ -36,7 +44,7 @@
         width: 341px;
         position: absolute;
         top: 17px;
-        left: 112px;
+        left: 7.4%;
       }
       #pageTitle img {
         transition: filter 0.3s ease;
@@ -198,5 +206,32 @@
       </nav>
     </header>
     <section class="box"></section>
+    <script>
+      const header = document.querySelector("header");
+      let lastScroll = 0;
+
+      window.addEventListener("scroll", () => {
+        const currentScroll = window.pageYOffset;
+
+        if (currentScroll <= 0) {
+          header.classList.remove("hidden");
+          return;
+        }
+
+        if (
+          currentScroll > lastScroll &&
+          !header.classList.contains("hidden")
+        ) {
+          header.classList.add("hidden");
+        } else if (
+          currentScroll < lastScroll &&
+          header.classList.contains("hidden")
+        ) {
+          header.classList.remove("hidden");
+        }
+
+        lastScroll = currentScroll;
+      });
+    </script>
   </body>
 </html>
