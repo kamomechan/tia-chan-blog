@@ -22,6 +22,20 @@ marked.setOptions({
   breaks: true,
 });
 
+function slugify(text, level) {
+  let slug = String(text)
+    .trim()
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^\p{L}\p{N}_-]+/gu, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+
+  if (!slug) slug = `h${level}-${Math.random().toString(36).slice(2, 6)}`;
+  if (/^[0-9]/.test(slug)) slug = `id-${slug}`;
+  return slug;
+}
+
 function processArticle(articleDir) {
   const articlePath = path.join(config.articlesPath, articleDir);
   const stats = fs.statSync(articlePath);
@@ -33,7 +47,45 @@ function processArticle(articleDir) {
 
   const markdown = fs.readFileSync(markdownFile, "utf8");
   const { data: fm, content: markdownContent } = matter(markdown);
+
+  const headings = [];
+
+  const renderer = {
+    heading(token) {
+      const level = token.depth;
+      const text = token.text;
+      const html = this.parser.parseInline(token.tokens);
+
+      const anchor = slugify(text, level);
+
+      if (level === 1) return `<h1 id="${anchor}">${html}</h1>`;
+      headings.push({ text, level, anchor });
+      return `<h${level} id="${anchor}">${html}</h${level}>`;
+    },
+  };
+
+  marked.use({ gfm: true, breaks: true, renderer });
+
   const htmlContent = marked.parse(markdownContent);
+
+  let sidebarHtml = "";
+  if (headings.length) {
+    sidebarHtml = '<div class="sidebar-nav"><ul>';
+    let current = 1;
+    headings.forEach((h) => {
+      while (current < h.level) {
+        sidebarHtml += "<ul>";
+        current++;
+      }
+      while (current > h.level) {
+        sidebarHtml += "</ul>";
+        current--;
+      }
+      sidebarHtml += `<li><a href="#${h.anchor}">${h.text}</a></li>`;
+    });
+    while (current-- > 1) sidebarHtml += "</ul>";
+    sidebarHtml += "</ul></div>";
+  }
 
   let finalHtml = fs.readFileSync(config.templateArticlePath, "utf8");
   finalHtml = finalHtml.replace(
@@ -45,6 +97,8 @@ function processArticle(articleDir) {
     "<title></title>",
     `<title>${articleDir}</title>`
   );
+
+  finalHtml = finalHtml.replace("<!--SIDEBAR-->", sidebarHtml);
 
   const outputFilename = path.join(
     config.outputPath,
