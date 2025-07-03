@@ -1,9 +1,12 @@
 const fs = require("fs");
 const path = require("path");
 const marked = require("marked");
+const matter = require("gray-matter");
+const cheerio = require("cheerio");
 
 const config = {
   templateArticlePath: path.join(__dirname, "/templates/article.html"),
+  templateIndexPath: path.join(__dirname, "/templates/index.html"),
   articlesPath: path.join(__dirname, "/articles"),
   fontsPath: path.join(__dirname, "/fonts"),
   staticPath: path.join(__dirname, "/images"),
@@ -29,7 +32,8 @@ function processArticle(articleDir) {
   if (!fs.existsSync(markdownFile)) return;
 
   const markdown = fs.readFileSync(markdownFile, "utf8");
-  const htmlContent = marked.parse(markdown);
+  const { data: fm, content: markdownContent } = matter(markdown);
+  const htmlContent = marked.parse(markdownContent);
 
   let finalHtml = fs.readFileSync(config.templateArticlePath, "utf8");
   finalHtml = finalHtml.replace(
@@ -72,6 +76,36 @@ function processArticle(articleDir) {
   }
 
   console.log(`Generated article complete: ${articleDir}`);
+  return {
+    link: `post/${articleDir}`,
+    title: fm.title || articleDir,
+    description: fm.description || "",
+    date: fm.date ? new Date(fm.date) : new Date(),
+  };
+}
+
+function buildIndex(pagesMeta) {
+  if (!fs.existsSync(config.templateIndexPath)) return;
+  const tpl = fs.readFileSync(config.templateIndexPath, "utf8");
+
+  const $ = cheerio.load(tpl);
+
+  pagesMeta.sort((a, b) => b.date - a.date);
+
+  const $box = $("#box-article").empty();
+  pagesMeta.forEach((p) => {
+    $box.append(`
+        <a href="${p.link}">
+          <article>
+            <h1>${p.title}</h1>
+            <p>${p.description}</p>
+          </article>
+        </a>
+      `);
+  });
+
+  fs.writeFileSync(path.join(config.outputPath, "index.html"), $.html());
+  console.log("Generated homepage complete");
 }
 
 function copyResources() {
@@ -127,9 +161,14 @@ function build() {
       fs.mkdirSync(config.outputPath, { recursive: true });
     }
 
+    const metas = [];
     const articles = fs.readdirSync(config.articlesPath);
-    articles.forEach((articleDir) => processArticle(articleDir));
+    articles.forEach((articleDir) => {
+      const meta = processArticle(articleDir);
+      if (meta) metas.push(meta);
+    });
 
+    buildIndex(metas);
     copyResources();
 
     console.log("All tasks completed successfully!");

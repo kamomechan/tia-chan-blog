@@ -1,3 +1,9 @@
+---
+title: vndb-rss
+date: 2025-06-01
+description: VNDB RSS 订阅服务，通过调用 vndb-api 获取数据，用来追踪最近发布的视觉小说，并进行格式化显示
+---
+
 # vndb-rss
 
 ## 简介
@@ -39,17 +45,17 @@ RSS 阅读器分别是开源的 [fluent-reader](https://github.com/yang991178/fl
 当前仓库包含多个分支版本，根据语言支持和是否包含封面图进行区分：
 
 - **v1** / **v1-image**：共有 5 个路由：
-  
+
   - `/offi-ch`、`/offi-en`、`/offi-jp`（官方中文 / 英文 / 日文）
-  
+
   - `/uo-ch`、`/uo-en`（民间汉化 / Fan Translation）
 
 - **v2** / **v2-image**：基于 v1 分支进行路由合并，仅保留 3 个路由：
-  
+
   - `/official`：包含官方中文与官方英文
-  
+
   - `/offi-jp`：官方日文
-  
+
   - `/unofficial`：包含民间汉化与 Fan Translation
 
 - 含 `-image` 后缀的分支会在 RSS 中附带封面图，普通分支则不会。
@@ -67,7 +73,7 @@ RSS 阅读器分别是开源的 [fluent-reader](https://github.com/yang991178/fl
 ### 部署到服务器
 
 1. 克隆仓库，并切换到你想要运行的分支
-   
+
    ```bash
     git clone https://github.com/kamomechan/vndb-rss.git
     cd vndb-rss
@@ -75,7 +81,7 @@ RSS 阅读器分别是开源的 [fluent-reader](https://github.com/yang991178/fl
    ```
 
 2. 下载 [nodejs](https://nodejs.org/en/download)，版本号应大于等于下列展示的
-   
+
    ```json
     "engines": {
     "node": ">=22.15.0",
@@ -84,13 +90,13 @@ RSS 阅读器分别是开源的 [fluent-reader](https://github.com/yang991178/fl
    ```
 
 3. 根据`.env`文件注释进行配置
-   
+
    ```bash
    vim .env
    ```
 
 4. 运行
-   
+
    ```bash
    npm install
    npm start
@@ -99,17 +105,17 @@ RSS 阅读器分别是开源的 [fluent-reader](https://github.com/yang991178/fl
 ### 部署到 vercel
 
 1. 点击下面的按钮将其部署到 vercel。
-   
+
    [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/import/project?template=https://github.com/kamomechan/vndb-rss)
 
 2. 转到 Environment Variables 选项卡并添加以下变量：
-   
+
    - `TOKEN` : 你的 VNDB token
    - `SAFETY_MODE`: NSFW 表示不过滤非安全图片，SFW 表示过滤非安全图片。默认值为 SFW，只展示安全的图片(推送条目没有被过滤，只是不展示 NSFW 图片而已) (可选)
    - `DOMAIN` : 你的域名或 vercel 即将分配的域名(不加 http 协议前缀)
-   
+
    其余配置请见 `.env` 文件，如需设置缓存和条目获取数量，请确保设置符合 [VNDB API 条款](https://api.vndb.org/kana#usage-terms)，建议保持默认即可
-   
+
    > API access is rate-limited in order to keep server resources in
    > check. The server will allow up to 200 requests per 5 minutes and up to
    > 1 second of execution time per minute. Requests taking longer than 3
