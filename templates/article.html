@@ -263,6 +263,11 @@
         margin-left: 1em;
       }
 
+      .sidebar-nav a.active {
+        font-weight: 600;
+        color: rgb(180, 90, 98);
+      }
+
       .back-to-top {
         position: fixed;
         bottom: -100px;
@@ -417,6 +422,56 @@
       backToTopBtn.addEventListener("click", () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
       });
+
+      const links = document.querySelectorAll(".sidebar-nav a");
+      const map = {};
+      const sidebar = document.querySelector("aside");
+
+      let isManualClick = false;
+      links.forEach((link) => {
+        link.addEventListener("click", (e) => {
+          isManualClick = true;
+          links.forEach((l) => l.classList.remove("active"));
+          link.classList.add("active");
+          setTimeout(() => {
+            isManualClick = false;
+          }, 500);
+        });
+      });
+
+      links.forEach((l) => (map[l.getAttribute("href").slice(1)] = l));
+      const io = new IntersectionObserver(
+        (entries) => {
+          if (isManualClick) return;
+          entries.forEach((e) => {
+            if (e.intersectionRatio > 0) {
+              links.forEach((l) => l.classList.remove("active"));
+              //   map[e.target.id]?.classList.add("active");
+              const activeLink = map[e.target.id];
+              if (activeLink) {
+                activeLink.classList.add("active");
+                const sidebarRect = sidebar.getBoundingClientRect();
+                const linkRect = activeLink.getBoundingClientRect();
+                const scrollAmount =
+                  linkRect.top - sidebarRect.top - sidebarRect.height / 2;
+                sidebar.scrollBy({
+                  top: scrollAmount,
+                  behavior: "smooth",
+                });
+              }
+            }
+          });
+        },
+        {
+          threshold: 0,
+          rootMargin: "0px 0px -80% 0px",
+        }
+      );
+      document
+        .querySelectorAll(
+          "article h2,article h3,article h4,article h5,article h6"
+        )
+        .forEach((h) => io.observe(h));
     </script>
   </body>
 </html>
