@@ -234,6 +234,28 @@
         max-width: 100%;
       }
 
+      pre {
+        position: relative;
+      }
+
+      .copy-btn {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background: rgba(255, 131, 140, 0.5);
+        color: rgb(180, 90, 98);
+        border: none;
+        padding: 3px 8px;
+        font-size: 12px;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+
+      pre:hover .copy-btn {
+        opacity: 0.9;
+      }
+
       aside {
         position: fixed;
         width: 20%;
@@ -472,6 +494,24 @@
           "article h2,article h3,article h4,article h5,article h6"
         )
         .forEach((h) => io.observe(h));
+
+      document.querySelectorAll("pre > code").forEach((codeBlock) => {
+        const btn = document.createElement("button");
+        btn.className = "copy-btn";
+        btn.textContent = "Copy";
+
+        codeBlock.parentNode.prepend(btn);
+
+        btn.addEventListener("click", () => {
+          navigator.clipboard
+            .writeText(codeBlock.textContent)
+            .then(() => {
+              btn.textContent = "Copied!";
+              setTimeout(() => (btn.textContent = "Copy"), 2000);
+            })
+            .catch((err) => console.error("Fail:", err));
+        });
+      });
     </script>
   </body>
 </html>
