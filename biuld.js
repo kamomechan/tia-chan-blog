@@ -8,8 +8,7 @@ const config = {
   templateArticlePath: path.join(__dirname, "/templates/article.html"),
   templateIndexPath: path.join(__dirname, "/templates/index.html"),
   articlesPath: path.join(__dirname, "/articles"),
-  fontsPath: path.join(__dirname, "/fonts"),
-  staticPath: path.join(__dirname, "/images"),
+  assetsPath: path.join(__dirname, "/assets"),
   outputPath: path.join(__dirname, "/dist"),
 };
 
@@ -29,6 +28,20 @@ function slugify(text, level) {
   if (!slug) slug = `h${level}-${Math.random().toString(36).slice(2, 6)}`;
   if (/^[0-9]/.test(slug)) slug = `id-${slug}`;
   return slug;
+}
+
+function copyRecursive(src, dest) {
+  const entries = fs.readdirSync(src, { withFileTypes: true });
+  for (const entry of entries) {
+    const srcPath = path.join(src, entry.name);
+    const destPath = path.join(dest, entry.name);
+    if (entry.isDirectory()) {
+      if (!fs.existsSync(destPath)) fs.mkdirSync(destPath, { recursive: true });
+      copyRecursive(srcPath, destPath);
+    } else {
+      fs.copyFileSync(srcPath, destPath);
+    }
+  }
 }
 
 function processArticle(articleDir) {
@@ -116,12 +129,7 @@ function processArticle(articleDir) {
       fs.mkdirSync(outputImagesPath, { recursive: true });
     }
 
-    fs.readdirSync(articleImagesPath).forEach((file) => {
-      fs.copyFileSync(
-        path.join(articleImagesPath, file),
-        path.join(outputImagesPath, file)
-      );
-    });
+    copyRecursive(articleImagesPath, outputImagesPath);
   }
 
   console.log(`Generated article complete: ${articleDir}`);
@@ -158,45 +166,10 @@ function buildIndex(pagesMeta) {
 }
 
 function copyResources() {
-  if (fs.existsSync(config.fontsPath)) {
-    const outputFontsPath = path.join(config.outputPath, "fonts");
-    if (!fs.existsSync(outputFontsPath)) {
-      fs.mkdirSync(outputFontsPath, { recursive: true });
-    }
-
-    fs.readdirSync(config.fontsPath).forEach((file) => {
-      fs.copyFileSync(
-        path.join(config.fontsPath, file),
-        path.join(outputFontsPath, file)
-      );
-    });
-    console.log("Fonts copied successfully");
-  }
-
-  if (fs.existsSync(config.staticPath)) {
-    const copyRecursive = (src, dest) => {
-      const entries = fs.readdirSync(src, { withFileTypes: true });
-
-      for (let entry of entries) {
-        const srcPath = path.join(src, entry.name);
-        const destPath = path.join(dest, entry.name);
-
-        if (entry.isDirectory()) {
-          if (!fs.existsSync(destPath)) {
-            fs.mkdirSync(destPath, { recursive: true });
-          }
-          copyRecursive(srcPath, destPath);
-        } else {
-          fs.copyFileSync(srcPath, destPath);
-        }
-      }
-    };
-
-    const outputImagesPath = path.join(config.outputPath, "images");
-    if (!fs.existsSync(outputImagesPath)) {
-      fs.mkdirSync(outputImagesPath, { recursive: true });
-    }
-    copyRecursive(config.staticPath, outputImagesPath);
+  if (fs.existsSync(config.assetsPath)) {
+    const out = path.join(config.outputPath, "assets");
+    if (!fs.existsSync(out)) fs.mkdirSync(out, { recursive: true });
+    copyRecursive(config.assetsPath, out);
     console.log("Assets copied successfully");
   }
 }
