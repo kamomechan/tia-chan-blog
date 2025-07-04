@@ -17,11 +17,6 @@ if (!fs.existsSync(config.outputPath)) {
   fs.mkdirSync(config.outputPath, { recursive: true });
 }
 
-marked.setOptions({
-  gfm: true,
-  breaks: true,
-});
-
 function slugify(text, level) {
   let slug = String(text)
     .trim()
