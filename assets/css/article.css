@@ -87,14 +87,20 @@ article img {
   max-width: 100%;
 }
 
-pre {
+article pre {
   position: relative;
+  background-color: #818b981f;
+  margin: 0 0 1rem 0;
+}
+
+article pre code {
+  background-color: initial;
 }
 
 .copy-btn {
   position: absolute;
-  top: 5px;
-  right: 5px;
+  top: 0px;
+  right: 0px;
   background: rgba(255, 131, 140, 0.5);
   color: rgb(180, 90, 98);
   border: none;

@@ -54,3 +54,5 @@ pyftsubset LXGWNeoXiHeiScreen.ttf \
   --hinting-tables='' \
   --output-file=LXGWNeoXiHeiScreenPunct-subset.woff2
 ```
+
+**包**: 使用 [marked.js](https://github.com/markedjs/marked) 转换 markdown 文件为 html，[cheerio](https://github.com/cheeriojs/cheerio) 操作 dom 树，[gray-matter](https://github.com/jonschlinkert/gray-matter) 获取 markdown front matter 信息，[marked-highlight](https://www.npmjs.com/package/marked-highlight) 和 [highlight.js](https://github.com/highlightjs/highlight.js) 高亮代码块

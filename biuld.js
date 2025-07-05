@@ -1,8 +1,14 @@
-const fs = require("fs");
-const path = require("path");
-const marked = require("marked");
-const matter = require("gray-matter");
-const cheerio = require("cheerio");
+import fs from "fs";
+import path from "path";
+import { Marked } from "marked";
+import { markedHighlight } from "marked-highlight";
+import hljs from "highlight.js";
+import matter from "gray-matter";
+import * as cheerio from "cheerio";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const config = {
   templateArticlePath: path.join(__dirname, "/templates/article.html"),
@@ -44,101 +50,115 @@ function copyRecursive(src, dest) {
   }
 }
 
-function processArticle(articleDir) {
-  const articlePath = path.join(config.articlesPath, articleDir);
-  const stats = fs.statSync(articlePath);
+async function processArticle(articleDir) {
+  try {
+    const articlePath = path.join(config.articlesPath, articleDir);
+    const stats = fs.statSync(articlePath);
 
-  if (!stats.isDirectory()) return;
+    if (!stats.isDirectory()) return;
 
-  const markdownFile = path.join(articlePath, "index.md");
-  if (!fs.existsSync(markdownFile)) return;
+    const markdownFile = path.join(articlePath, "index.md");
+    if (!fs.existsSync(markdownFile)) return;
 
-  const markdown = fs.readFileSync(markdownFile, "utf8");
-  const { data: fm, content: markdownContent } = matter(markdown);
+    const markdown = fs.readFileSync(markdownFile, "utf8");
+    const { data: fm, content: markdownContent } = matter(markdown);
 
-  const headings = [];
+    const headings = [];
 
-  const renderer = {
-    heading(token) {
-      const level = token.depth;
-      const text = token.text;
-      const html = this.parser.parseInline(token.tokens);
+    const renderer = {
+      heading(token) {
+        const level = token.depth;
+        const text = token.text;
+        const html = this.parser.parseInline(token.tokens);
 
-      const anchor = slugify(text, level);
+        const anchor = slugify(text, level);
 
-      if (level === 1) return `<h1 id="${anchor}">${html}</h1>`;
-      headings.push({ text, level, anchor });
-      return `<h${level} id="${anchor}">${html}</h${level}>`;
-    },
-  };
+        if (level === 1) return `<h1 id="${anchor}">${html}</h1>`;
+        headings.push({ text, level, anchor });
+        return `<h${level} id="${anchor}">${html}</h${level}>`;
+      },
+    };
 
-  marked.use({ gfm: true, breaks: true, renderer });
-
-  const htmlContent = marked.parse(markdownContent);
-
-  let sidebarHtml = "";
-  if (headings.length) {
-    sidebarHtml = '<div class="sidebar-nav"><ul>';
-    let current = 1;
-    headings.forEach((h) => {
-      while (current < h.level) {
-        sidebarHtml += "<ul>";
-        current++;
-      }
-      while (current > h.level) {
-        sidebarHtml += "</ul>";
-        current--;
-      }
-      sidebarHtml += `<li><a href="#${h.anchor}">${h.text}</a></li>`;
-    });
-    while (current-- > 1) sidebarHtml += "</ul>";
-    sidebarHtml += "</ul></div>";
-  }
-
-  let finalHtml = fs.readFileSync(config.templateArticlePath, "utf8");
-  finalHtml = finalHtml.replace(
-    "<article></article>",
-    `<article>${htmlContent}</article>`
-  );
-
-  finalHtml = finalHtml.replace(
-    "<title></title>",
-    `<title>${articleDir}</title>`
-  );
-
-  finalHtml = finalHtml.replace("<!--SIDEBAR-->", sidebarHtml);
-
-  const outputFilename = path.join(
-    config.outputPath,
-    `post/${articleDir}/index.html`
-  );
-
-  const outputFileFolder = path.join(config.outputPath, `post/${articleDir}`);
-  if (!fs.existsSync(outputFileFolder)) {
-    fs.mkdirSync(outputFileFolder, { recursive: true });
-  }
-  fs.writeFileSync(outputFilename, finalHtml);
-
-  const articleImagesPath = path.join(articlePath, "images");
-  if (fs.existsSync(articleImagesPath)) {
-    const outputImagesPath = path.join(
-      config.outputPath,
-      `post/${articleDir}/images`
+    const marked = new Marked(
+      markedHighlight({
+        langPrefix: "hljs language-",
+        emptyLangClass: "hljs",
+        highlight(code, lang) {
+          const language = hljs.getLanguage(lang) ? lang : "plaintext";
+          return hljs.highlight(code, { language }).value;
+        },
+      })
     );
-    if (!fs.existsSync(outputImagesPath)) {
-      fs.mkdirSync(outputImagesPath, { recursive: true });
+    marked.use({ gfm: true, breaks: true, renderer });
+
+    const htmlContent = await marked.parse(markdownContent);
+
+    let sidebarHtml = "";
+    if (headings.length) {
+      sidebarHtml = '<div class="sidebar-nav"><ul>';
+      let current = 1;
+      headings.forEach((h) => {
+        while (current < h.level) {
+          sidebarHtml += "<ul>";
+          current++;
+        }
+        while (current > h.level) {
+          sidebarHtml += "</ul>";
+          current--;
+        }
+        sidebarHtml += `<li><a href="#${h.anchor}">${h.text}</a></li>`;
+      });
+      while (current-- > 1) sidebarHtml += "</ul>";
+      sidebarHtml += "</ul></div>";
     }
 
-    copyRecursive(articleImagesPath, outputImagesPath);
-  }
+    let finalHtml = fs.readFileSync(config.templateArticlePath, "utf8");
+    finalHtml = finalHtml.replace(
+      "<article></article>",
+      `<article>${htmlContent}</article>`
+    );
 
-  console.log(`Generated article complete: ${articleDir}`);
-  return {
-    link: `post/${articleDir}`,
-    title: fm.title || articleDir,
-    description: fm.description || "",
-    date: fm.date ? new Date(fm.date) : new Date(),
-  };
+    finalHtml = finalHtml.replace(
+      "<title></title>",
+      `<title>${articleDir}</title>`
+    );
+
+    finalHtml = finalHtml.replace("<!--SIDEBAR-->", sidebarHtml);
+
+    const outputFilename = path.join(
+      config.outputPath,
+      `post/${articleDir}/index.html`
+    );
+
+    const outputFileFolder = path.join(config.outputPath, `post/${articleDir}`);
+    if (!fs.existsSync(outputFileFolder)) {
+      fs.mkdirSync(outputFileFolder, { recursive: true });
+    }
+    fs.writeFileSync(outputFilename, finalHtml);
+
+    const articleImagesPath = path.join(articlePath, "images");
+    if (fs.existsSync(articleImagesPath)) {
+      const outputImagesPath = path.join(
+        config.outputPath,
+        `post/${articleDir}/images`
+      );
+      if (!fs.existsSync(outputImagesPath)) {
+        fs.mkdirSync(outputImagesPath, { recursive: true });
+      }
+
+      copyRecursive(articleImagesPath, outputImagesPath);
+    }
+
+    console.log(`Generated article complete: ${articleDir}`);
+    return {
+      link: `post/${articleDir}`,
+      title: fm.title || articleDir,
+      description: fm.description || "",
+      date: fm.date ? new Date(fm.date) : new Date(),
+    };
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 function buildIndex(pagesMeta) {
@@ -174,7 +194,7 @@ function copyResources() {
   }
 }
 
-function build() {
+async function build() {
   try {
     console.log("srart...");
 
@@ -185,10 +205,10 @@ function build() {
 
     const metas = [];
     const articles = fs.readdirSync(config.articlesPath);
-    articles.forEach((articleDir) => {
-      const meta = processArticle(articleDir);
+    for (const articleDir of articles) {
+      const meta = await processArticle(articleDir);
       if (meta) metas.push(meta);
-    });
+    }
 
     buildIndex(metas);
     copyResources();
