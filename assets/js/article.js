@@ -63,3 +63,40 @@ document.querySelectorAll("pre > code").forEach((codeBlock) => {
       .catch((err) => console.error("Fail:", err));
   });
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+  const images = document.querySelectorAll("article p img");
+  const modal = document.querySelector("#imageModal");
+  const modalImg = document.querySelector("#modalImage");
+  const closeBtn = document.querySelector(".close-btn");
+
+  images.forEach((img) => {
+    img.addEventListener("click", function () {
+      modal.style.display = "block";
+      modalImg.src = this.src;
+      modalImg.alt = this.alt;
+      document.body.style.overflow = "hidden";
+    });
+  });
+
+  closeBtn.addEventListener("click", function () {
+    closeModal();
+  });
+
+  modal.addEventListener("click", function (e) {
+    if (e.target === modal) {
+      closeModal();
+    }
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && modal.style.display === "block") {
+      closeModal();
+    }
+  });
+
+  function closeModal() {
+    modal.style.display = "none";
+    document.body.style.overflow = "auto";
+  }
+});
