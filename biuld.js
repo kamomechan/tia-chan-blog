@@ -245,6 +245,58 @@ function copyResources() {
   }
 }
 
+function generateRSS(pagesMeta, limit) {
+  const rssTemplate = `<?xml version="1.0" encoding="UTF-8" ?>
+  <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>tia-chan's blog</title>
+    <description>Discussing visual novels and moe culture, with occasional posts on open-source projects.</description>
+    <link>https://tia-chan.top</link>
+    <atom:link href="https://tia-chan.top/rss.xml" rel="self" type="application/rss+xml" />
+    <language>zh-cn</language>
+    <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
+    ${pagesMeta
+      .sort((a, b) => b.date - a.date)
+      .slice(0, limit)
+      .map((post) => {
+        return `
+      <item>
+        <title>${escapeXml(post.title)}</title>
+        <description>${escapeXml(post.description)}</description>
+        <link>https://tia-chan.top/post/${post.title}</link>
+        <guid isPermaLink="true">https://tia-chan.top/post/${post.title}</guid>
+        <pubDate>${post.date.toUTCString()}</pubDate>
+      </item>
+      `;
+      })
+      .join("")}
+  </channel>
+  </rss>`;
+
+  const outputFilename = path.join(config.outputPath, "rss.xml");
+  fs.writeFileSync(outputFilename, rssTemplate);
+  console.log("Generated RSS feed complete");
+}
+
+function escapeXml(unsafe) {
+  return unsafe.replace(/[<>&'"]/g, (c) => {
+    switch (c) {
+      case "<":
+        return "&lt;";
+      case ">":
+        return "&gt;";
+      case "&":
+        return "&amp;";
+      case "'":
+        return "&apos;";
+      case '"':
+        return "&quot;";
+      default:
+        return c;
+    }
+  });
+}
+
 async function build() {
   try {
     console.log("srart...");
@@ -262,6 +314,7 @@ async function build() {
     }
 
     buildIndex(metas);
+    generateRSS(metas, 10);
     copyResources();
 
     console.log("All tasks completed successfully!");
