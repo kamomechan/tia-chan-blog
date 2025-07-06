@@ -173,24 +173,67 @@ function buildIndex(pagesMeta) {
   if (!fs.existsSync(config.templateIndexPath)) return;
   const tpl = fs.readFileSync(config.templateIndexPath, "utf8");
 
-  const $ = cheerio.load(tpl);
-
   pagesMeta.sort((a, b) => b.date - a.date);
 
-  const $box = $("#box-article").empty();
-  pagesMeta.forEach((p) => {
-    $box.append(`
-        <a href="${p.link}">
-          <article>
-            <h1>${p.title}</h1>
-            <p>${p.description}</p>
-          </article>
-        </a>
-      `);
-  });
+  const postsPerPage = 5;
+  const totalPages = Math.ceil(pagesMeta.length / postsPerPage);
 
-  fs.writeFileSync(path.join(config.outputPath, "index.html"), $.html());
-  console.log("Generated homepage complete");
+  for (let page = 1; page <= totalPages; page++) {
+    const $ = cheerio.load(tpl);
+    const $box = $("#box-article").empty();
+
+    const startIdx = (page - 1) * postsPerPage;
+    const endIdx = Math.min(startIdx + postsPerPage, pagesMeta.length);
+
+    for (let i = startIdx; i < endIdx; i++) {
+      const p = pagesMeta[i];
+      $box.append(`
+          <a href="${p.link}">
+            <article>
+              <h1>${p.title}</h1>
+              <p>${p.description}</p>
+            </article>
+          </a>
+        `);
+    }
+
+    const $pagination = $('<div class="pagination"></div>');
+
+    if (page > 1) {
+      $pagination.append(
+        `<span><a href="${
+          page === 2 ? "index.html" : `page${page - 1}.html`
+        }" class="prev">Prev</a></span>`
+      );
+    }
+
+    for (let i = 1; i <= totalPages; i++) {
+      if (i === page) {
+        $pagination.append(`<span class="current">${i}</span>`);
+      }
+    }
+
+    $pagination.append(`<span class="separtor">/</span>`);
+
+    $pagination.append(`<span class="total-pages">${totalPages}</span>`);
+
+    if (page < totalPages) {
+      $pagination.append(
+        `<span><a href="page${page + 1}.html" class="next">Next</a></span>`
+      );
+    }
+
+    $box.after($pagination);
+
+    const outputFilename =
+      page === 1
+        ? path.join(config.outputPath, "index.html")
+        : path.join(config.outputPath, `page${page}.html`);
+
+    fs.writeFileSync(outputFilename, $.html());
+  }
+
+  console.log(`Generated homepage with ${totalPages} pages complete`);
 }
 
 function copyResources() {

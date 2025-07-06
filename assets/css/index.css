@@ -47,6 +47,21 @@ article:hover {
   background-color: rgba(234, 234, 234, 0.45);
 }
 
+.pagination {
+  margin-top: 1rem;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 1), 0 0 15px rgba(255, 255, 255, 0.8),
+    0 0 20px rgba(255, 255, 255, 0.6);
+}
+
+.pagination span {
+  padding: 0.2rem;
+  color: rgb(255, 79, 108);
+}
+.pagination a {
+  padding: 0.2rem;
+  color: rgb(255, 79, 108);
+}
+
 @media screen and (max-width: 500px) {
   section {
     width: 100%;
