@@ -152,10 +152,12 @@ article pre {
   position: relative;
   background-color: #818b981f;
   margin: 0 0 1rem 0;
+  padding: 0.2rem 0.5rem;
 }
 
 article pre code {
   background-color: initial;
+  padding: 0;
 }
 
 .copy-btn {

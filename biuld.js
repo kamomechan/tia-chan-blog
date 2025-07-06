@@ -123,6 +123,14 @@ async function processArticle(articleDir) {
       `<title>${articleDir}</title>`
     );
 
+    finalHtml = finalHtml.replace(
+      "<!-- meta-description -->",
+      `<meta
+      name="description"
+      content="${fm.description}"
+    />`
+    );
+
     finalHtml = finalHtml.replace("<!--SIDEBAR-->", sidebarHtml);
 
     const outputFilename = path.join(
