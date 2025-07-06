@@ -8,8 +8,6 @@
 
 **logo**: 通过 ps 调整字体为 `dancing script`并设置颜色，最后添加图层外发光样式
 
-**pagetop**: 灵感来源于八月社官网的 footer，不过没有 ユースティア，于是模仿相应的设计，根据ティア的表情包，通过 ps 抠图并添加文字，同时进行了创新，当页面滚动小于 300 时，只会显示呆毛><
-
 **字体**: 由于不同系统的默认字体不同，阅读体验也不同，平常阅读视觉小说时用黑体字看着舒服，于是中文则使用 [霞鹜新晰黑 屏幕阅读版](https://github.com/lxgw/LxgwNeoXiZhi-Screen)。不过原始字体文件太大了，之后通过 [font tools](https://github.com/fonttools/fonttools) 工具进行子集化(筛选包含的文字)，一般认为《现代汉语常用字表》(常用字 2500 字) 覆盖 99%的中文日常使用，于是子集文件就以它为准，最后从原来的 7MB 优化到了 290KB。
 
 ```shell
@@ -56,3 +54,7 @@ pyftsubset LXGWNeoXiHeiScreen.ttf \
 ```
 
 **包**: 使用 [marked.js](https://github.com/markedjs/marked) 转换 markdown 文件为 html，[cheerio](https://github.com/cheeriojs/cheerio) 操作 dom 树，[gray-matter](https://github.com/jonschlinkert/gray-matter) 获取 markdown front matter 信息，[marked-highlight](https://www.npmjs.com/package/marked-highlight) 和 [highlight.js](https://github.com/highlightjs/highlight.js) 高亮代码块
+
+## License
+
+本项目所使用的背景图片版权归 [August-soft](https://august-soft.com/) 所有，已遵守 [August-soft ](https://august-soft.com/about/terms_guideline) 条款，仅用作个人使用，不修改不商用不分发。代码则使用 MIT 开源许可证
