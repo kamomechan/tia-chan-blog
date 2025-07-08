@@ -26,7 +26,7 @@ section a {
 
 article {
   padding: 1.5rem;
-  background-color: rgba(255, 255, 255, 0.45);
+  background-color: rgba(255, 255, 255, 0.7);
   box-shadow: 0 2px 2px rgba(255, 255, 255, 0.25);
   text-shadow: 0 0 8px rgba(255, 255, 255, 1), 0 0 15px rgba(255, 255, 255, 0.8),
     0 0 20px rgba(255, 255, 255, 0.6);
@@ -44,7 +44,7 @@ article p {
 }
 
 article:hover {
-  background-color: rgba(234, 234, 234, 0.45);
+  background-color: rgba(233, 233, 233, 0.7);
 }
 
 .pagination {
@@ -74,6 +74,7 @@ article:hover {
   }
   article {
     padding: 1rem;
+    background-color: rgba(255, 255, 255, 0.75);
   }
   article h1 {
     font-size: 28px;

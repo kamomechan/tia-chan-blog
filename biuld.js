@@ -241,8 +241,19 @@ function copyResources() {
     const out = path.join(config.outputPath, "assets");
     if (!fs.existsSync(out)) fs.mkdirSync(out, { recursive: true });
     copyRecursive(config.assetsPath, out);
-    console.log("Assets copied successfully");
   }
+
+  const filesToCopy = ["favicon.ico", "robots.txt"];
+  for (const fileToCopy of filesToCopy) {
+    const srcPath = path.join(__dirname, `/${fileToCopy}`);
+    const destPath = path.join(config.outputPath, fileToCopy);
+    if (fs.existsSync(srcPath)) {
+      const fileContent = fs.readFileSync(srcPath);
+      fs.writeFileSync(destPath, fileContent);
+    }
+  }
+
+  console.log("Assets copied successfully");
 }
 
 function generateRSS(pagesMeta, limit) {
