@@ -96,19 +96,9 @@ async function processArticle(articleDir) {
     let sidebarHtml = "";
     if (headings.length) {
       sidebarHtml = '<div class="sidebar-nav"><ul>';
-      let current = 1;
       headings.forEach((h) => {
-        while (current < h.level) {
-          sidebarHtml += "<ul>";
-          current++;
-        }
-        while (current > h.level) {
-          sidebarHtml += "</ul>";
-          current--;
-        }
-        sidebarHtml += `<li><a href="#${h.anchor}">${h.text}</a></li>`;
+        sidebarHtml += `<li data-level="${h.level}"><a href="#${h.anchor}">${h.text}</a></li>`;
       });
-      while (current-- > 1) sidebarHtml += "</ul>";
       sidebarHtml += "</ul></div>";
     }
 
